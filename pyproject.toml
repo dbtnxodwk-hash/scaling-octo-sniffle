@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "heavycon_analyzer"
+version = "0.1.0"
+description = "Offline, CPU-only desktop tool that OCRs scanned BIMCO HEAVYCON 2007 charter party PDFs and extracts PART I Box 1-30 fields into a table with CSV/XLSX export."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "heavycon_analyzer" }]
+keywords = ["heavycon", "bimco", "charter-party", "ocr", "tesseract"]
+
+# NOTE: The core package (import heavycon_analyzer) has ZERO third-party
+# runtime dependencies. Everything here is pure stdlib. The OCR/PDF pipeline
+# needs extra packages, but those live behind lazy-import adapters and are
+# declared as the OPTIONAL "ocr" group below. They (plus the Tesseract engine
+# itself) are only installed on a real machine, never required to import,
+# unit-test, or run the exporters/box definitions.
+dependencies = []
+
+[project.optional-dependencies]
+# Optional OCR/PDF pipeline dependencies. Installed only on a real (networked)
+# machine, in addition to the system Tesseract OCR engine. NOT required for the
+# core package, tests, or CSV/XLSX export.
+ocr = [
+    "pytesseract>=0.3.10",
+    "Pillow>=10.0",
+    "PyMuPDF>=1.24",
+]
+# Development / packaging extras (also network-only).
+dev = [
+    "pytest>=8",
+    "ruff>=0.5",
+    "black>=24",
+]
+packaging = [
+    "pyinstaller>=6",
+]
+
+[project.scripts]
+heavycon-analyzer = "heavycon_analyzer.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+heavycon_analyzer = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
