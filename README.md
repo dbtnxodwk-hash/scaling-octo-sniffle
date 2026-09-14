@@ -133,21 +133,32 @@ python -m heavycon_analyzer
 ```
 py -m pip install pyinstaller
 py -m pip install .[ocr]
-pyinstaller --noconfirm packaging/heavycon_analyzer.spec
+py -m PyInstaller --noconfirm packaging/heavycon_analyzer.spec
 ```
 
-동봉된 스펙 대신 명령 한 줄로 만들 수도 있습니다.
+> **주의:** `pyinstaller` 명령이 "명령을 찾을 수 없습니다" 라고 나오면(PATH 에
+> 등록되지 않은 경우), 위처럼 반드시 `py -m PyInstaller` 형태로 실행하세요.
+> (`PyInstaller` 의 대소문자도 그대로 맞춰야 합니다.)
 
-```
-pyinstaller --noconfirm --windowed --name HeavyconAnalyzer ^
-    --hidden-import fitz --hidden-import pytesseract --hidden-import PIL ^
-    src/heavycon_analyzer/__main__.py
-```
-
-- 결과물은 `dist/HeavyconAnalyzer/HeavyconAnalyzer.exe` 에 생성됩니다.
+- 결과물은 `dist/HeavyconAnalyzer/HeavyconAnalyzer.exe` 에 생성됩니다. 이제
+  이 파일을 더블클릭하면 프로그램 창이 정상적으로 열립니다.
 - 이 `.exe` 는 파이썬 코드와 파이썬 패키지만 포함합니다. **Tesseract OCR
   엔진은 포함하지 않으므로**, 실행할 대상 컴퓨터에도 3번의 Tesseract 엔진을
   반드시 설치해야 합니다.
+
+> 빌드 없이 소스에서 바로 실행하고 싶다면 아래 명령이 계속 유효합니다.
+>
+> ```
+> py -m heavycon_analyzer
+> ```
+>
+> 예전 버전은 `.exe` 를 실행하면
+> `ImportError: attempted relative import with no known parent package`
+> 오류로 즉시 종료되었습니다. 이는 PyInstaller 가 패키지 진입 파일
+> (`__main__.py`)을 최상위 스크립트로 실행하면서 상대(relative) 임포트가 부모
+> 패키지를 찾지 못했기 때문입니다. 이제는 절대(absolute) 임포트를 사용하는
+> 전용 진입 스크립트(`packaging/launcher.py`)로 빌드하므로 이 오류가
+> 발생하지 않습니다.
 
 ---
 
